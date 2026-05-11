@@ -1,6 +1,7 @@
-
 def insertion_sort(arr, left, right):
-    for i in range(left + 1, right + 1):
+    i = left + 1
+
+    while i <= right:
         key = arr[i]
         j = i - 1
 
@@ -9,49 +10,53 @@ def insertion_sort(arr, left, right):
             j -= 1
 
         arr[j + 1] = key
+        i += 1
 
 
-def median_of_three(arr, a, b, c):
-    x = arr[a]
-    y = arr[b]
-    z = arr[c]
+def median_of_three(arr, low, high):
+    mid = (low + high) // 2
 
-    if x < y:
-        if y < z:
-            return b
-        elif x < z:
-            return c
-        else:
-            return a
-    else:
-        if x < z:
-            return a
-        elif y < z:
-            return c
-        else:
-            return b
+    if arr[low] > arr[mid]:
+        arr[low], arr[mid] = arr[mid], arr[low]
+
+    if arr[low] > arr[high]:
+        arr[low], arr[high] = arr[high], arr[low]
+
+    if arr[mid] > arr[high]:
+        arr[mid], arr[high] = arr[high], arr[mid]
+
+    arr[mid], arr[high - 1] = arr[high - 1], arr[mid]
+
+    return arr[high - 1]
 
 
 def partition(arr, low, high):
-    mid = (low + high) // 2
-    pivot_index = median_of_three(arr, low, mid, high)
+    pivot = median_of_three(arr, low, high)
 
-    arr[pivot_index], arr[high] = arr[high], arr[pivot_index]
-    pivot = arr[high]
+    i = low
+    j = high - 1
 
-    i = low - 1
+    while True:
 
-    for j in range(low, high):
-        if arr[j] <= pivot:
+        i += 1
+        while arr[i] < pivot:
             i += 1
-            arr[i], arr[j] = arr[j], arr[i]
 
-    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+        j -= 1
+        while arr[j] > pivot:
+            j -= 1
 
-    return i + 1
+        if i >= j:
+            break
+
+        arr[i], arr[j] = arr[j], arr[i]
+
+    arr[i], arr[high - 1] = arr[high - 1], arr[i]
+
+    return i
 
 
-def RafaelSort(arr):
+def rafael_sort(arr):
     n = len(arr)
 
     if n <= 1:
@@ -64,9 +69,17 @@ def RafaelSort(arr):
 
         while low < high:
 
-            if high - low < 24:
+            if high - low <= 24:
                 insertion_sort(arr, low, high)
                 break
 
-            p = partition(arr, low, high)
+            pivot_index = partition(arr, low, high)
+
+            if pivot_index - low < high - pivot_index:
+                stack.append((pivot_index + 1, high))
+                high = pivot_index - 1
+            else:
+                stack.append((low, pivot_index - 1))
+                low = pivot_index + 1
+
     return arr
